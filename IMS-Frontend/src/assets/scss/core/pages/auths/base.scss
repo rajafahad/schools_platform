@@ -1,0 +1,62 @@
+/// Global Auths
+/////////////////////////////
+
+.nk-auth{
+    &-custom-select-color option[disabled]:checked {
+        color: lightgray;
+      }
+    &-footer{
+        padding-bottom: 40px;
+    }
+    &-pCard{
+        padding-top: 20px;
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+    &-wizard{
+        width: 100%;
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    &-body,&-footer{
+        width: 100%;
+        max-width: 420px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    &-footer{
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+    &-footer-full{
+        margin-top: 0;
+    }
+}
+
+@include media-breakpoint-up(lg){
+    .nk-auth{
+        &-container{
+            width: 45%;
+        }
+    }
+}
+@include media-breakpoint-up(xxl){
+    .nk-auth{
+        &-body,&-footer{
+            .nk-split & {
+                margin-right: 90px;
+            }
+        }
+    }
+}
+
+@include media-breakpoint-up(sm){
+    .nk-auth{
+        &-pCard{
+            padding-top: 20px;
+            padding-right: 100px;
+            padding-left: 100px;
+        }
+    }
+}

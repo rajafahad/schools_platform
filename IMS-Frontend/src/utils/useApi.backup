@@ -1,0 +1,120 @@
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+const useApi = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [data, setData] = useState(null);
+  const navigate = useNavigate();
+
+  const UseApi = axios.create({
+    baseURL: "http://localhost:5000/",
+  });
+
+  UseApi.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        config.headers.Authorization = token;
+        setIsLoading(true);
+        return config;
+      } else {
+        // Redirect to login page
+        navigate("/auth-login");
+        return Promise.reject("Token is not available");
+      }
+    },
+    (error) => {
+      setIsLoading(false);
+      return Promise.reject(error);
+    }
+  );
+
+  UseApi.interceptors.response.use(
+    (response) => {
+      setIsLoading(false);
+      setData(response.data);
+      return response.data;
+    },
+    (error) => {
+      setIsLoading(false);
+      if (error.response) {
+        const status = error.response.status;
+
+        if (status === 401) {
+          // Unauthorized - Token is not valid
+          toast.error("Unauthorized. Please login again.", {
+            position: "top-right",
+            autoClose: 2000,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: true,
+          });
+        } else if (status === 404) {
+          // Not Found
+          toast.error("Not Found.", {
+            position: "top-right",
+            autoClose: 2000,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: true,
+          });
+        } else if (status === 422) {
+          // Validation Error
+          toast.warning("Validation Failed. Some Field is required", {
+            position: "top-right",
+            autoClose: 2000,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: true,
+          });
+        } else {
+          // Other error
+          toast.error("Internal Error", {
+            position: "top-right",
+            autoClose: 2000,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: true,
+          });
+        }
+      } else if (error.code === "ECONNABORTED" && error.message.includes("timeout")) {
+        // Timeout error
+        toast.info("Timeout", {
+          position: "top-right",
+          autoClose: 2000,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: true,
+        });
+      } else if (error.request) {
+        // Network error
+        toast.info("Network, Please Check Internet Connection", {
+          position: "top-right",
+          autoClose: 2000,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: true,
+        });
+      } else {
+        // Something else happened
+        toast.info("Something else Error", {
+          position: "top-right",
+          autoClose: 2000,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: true,
+        });
+      }
+
+      setError(error);
+      return Promise.reject(error);
+    }
+  );
+
+  return { UseApi, isLoading, data, error };
+};
+
+// export default useApi;
